@@ -49,6 +49,7 @@ export interface IDocument {
   FileExtension: string;
   EditorOWSUserName: string;
   EditorOWSUserEmail: string;
+  LastModifiedTime: string;
 }
 
 export interface IDocumentsSpFxState {
@@ -114,6 +115,7 @@ export default class DocumentsSpFx extends React.Component<IDocumentsSpFxWebPart
               FileExtension={doc.FileExtension}
               EditorOWSUserName={doc.EditorOWSUserName}
               EditorOWSUserEmail={doc.EditorOWSUserEmail}
+              LastModifiedTime={doc.LastModifiedTime}
               />
           );
         });
@@ -200,10 +202,10 @@ class Document extends React.Component<IDocument, IDocument> {
               </div>
             </div>
           </div>
-          <a className='ms-Link' href={this.props.ServerRedirectedURL} target='_blank'>{this.props.Title}</a>
+          <a className='ms-Link' href={this.props.ServerRedirectedURL} target='_blank' title={this.props.Title}>{this.props.Title}</a>
         </span>
         <span className={tTextClassName}>
-          <a className='ms-Link' href={profileUrl} target='_blank'>{this.props.EditorOWSUserName}</a>
+          <a className='ms-Link' href={profileUrl} target='_blank' title={this.props.EditorOWSUserName}>{this.props.EditorOWSUserName}</a>
         </span>
         <span className="ms-ListItem-metaText"></span>
 

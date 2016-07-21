@@ -36,7 +36,7 @@ export default class DocumentFetcher {
 
     let apiUri: string = ''; // `/_api/web/lists?$filter=Hidden eq false`
     if (props.mode.toString() === '2') { // DocumentsMode.AllRecent
-      const sortlist = "sortlist='LastModifiedTime:descending'";
+      const sortlist: string = "sortlist='LastModifiedTime:descending'";
       apiUri = '?' + queryText + '&' + sortlist + '&rowlimit=' + props.rowLimit.toString() + '&' + selectProps;
     } else if (props.mode.toString() === '1') { // DocumentsMode.MyRecent
       const officeGraph: string = "properties='GraphQuery:ACTOR(ME\\,OR(action\\:1001\\,action\\:1003)),"
