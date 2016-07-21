@@ -13,7 +13,6 @@ import {
   FocusZone,
   FocusZoneDirection,
   IFocusZoneProps,
-  List,
   KeyCodes,
   css,
   Spinner,
@@ -48,19 +47,25 @@ export interface IDocument {
   Title: string;
   ServerRedirectedURL: string;
   FileExtension: string;
+  EditorOWSUserName: string;
+  EditorOWSUserEmail: string;
 }
 
 export interface IDocumentsSpFxState {
   documents: IDocument[];
   webpartTitle: string;
+  props: IDocumentsSpFxWebPartProps;
 }
 
 class DocumentsSpFxState implements IDocumentsSpFxState {
   public documents: IDocument[];
   public webpartTitle: string;
+  public props: IDocumentsSpFxWebPartProps;
 
-  constructor(documents: IDocument[], webpartTitle: string) {
+  constructor(documents: IDocument[], webpartTitle: string, props: IDocumentsSpFxWebPartProps) {
     this.webpartTitle = webpartTitle;
+    this.props = props;
+
     if (documents && documents.length > 0) {
       this.documents = documents;
     } else if (documents && documents.length < 1) {
@@ -73,55 +78,57 @@ class DocumentsSpFxState implements IDocumentsSpFxState {
 
 export default class DocumentsSpFx extends React.Component<IDocumentsSpFxWebPartProps, IDocumentsSpFxState> {
   public componentWillMount(): void {
-    this.setState(new DocumentsSpFxState(null, 'Loading...'));
+    this.setState(new DocumentsSpFxState(null, 'Loading...', this.props));
   }
 
   public componentDidMount(): void {
     this._updateState();
   }
 
-  public componentWillReceiveProps(): void {
-    this._updateState();
+  public componentDidUpdate(): void {
+    if (this.state.props.fileExtensions === this.props.fileExtensions
+      && this.state.props.mode === this.props.mode
+      && this.state.props.noResultsMessage === this.props.noResultsMessage
+      && this.state.props.rowLimit === this.props.rowLimit
+      && this.state.props.scope === this.props.scope) {
+      // Do nothing
+    } else {
+      this._updateState();
+    }
   }
-
-  public shouldComponentUpdate(): boolean {
-    return true;
-  }
-
-  // public render(): React.ReactElement<IFocusZoneProps> {
-  //   const _self: DocumentsSpFx = this;
-  //   if (_self.state && _self.state.documents && _self.state.documents.length > 0) {
-
-  //     const docs: JSX.Element[] = _self.state.documents.map((doc: IDocument, indx: number) =>
-  //       <Document key={indx} Title={doc.Title} ServerRedirectedURL={doc.ServerRedirectedURL} FileExtension={doc.FileExtension} />
-  //     );
-  //     return (
-  //       <div>
-  //         <h1>{_self.state.webpartTitle}</h1>
-  //         <ul className={styles.spfxDocumentUl}>
-  //           {docs}
-  //         </ul>
-  //       </div>
-  //     );
-  //   } else {
-  //     return <div className={styles.spfxDocumentUl}>{_self.props.noResultsMessage}</div>;
-  //   }
-  // }
 
   public render(): React.ReactElement<IFocusZoneProps> {
     if (this.state && this.state.documents) {
       if (this.state.documents.length > 0) {
+        const docs: JSX.Element[] = this.state.documents.map(doc => {
+          return (
+            <Document
+              key={doc.ServerRedirectedURL}
+              Title={doc.Title}
+              ServerRedirectedURL={doc.ServerRedirectedURL}
+              FileExtension={doc.FileExtension}
+              EditorOWSUserName={doc.EditorOWSUserName}
+              EditorOWSUserEmail={doc.EditorOWSUserEmail}
+              />
+          );
+        });
+        const headingClassName: string = css(
+          'pr-left-padding',
+          styles['pr-left-padding'],
+          'ms-font-xxl');
+
         return (
           <FocusZone
             direction={ FocusZoneDirection.vertical }
             isInnerZoneKeystroke={ (ev: KeyboardEvent) => ev.which === KeyCodes.right }
+            className={styles.spfxDocumentUl}
             >
-            <h1>{this.state.webpartTitle}</h1>
-            <List
-              className={ styles.spfxDocumentUl }
-              items={ this.state.documents }
-              onRenderCell={ this._onRenderDoc }
-              />
+            <div className={headingClassName}>
+              {this.state.webpartTitle}
+            </div>
+            <ul className="ms-List">
+              {docs}
+            </ul>
           </FocusZone>
         );
       } else {
@@ -132,21 +139,15 @@ export default class DocumentsSpFx extends React.Component<IDocumentsSpFxWebPart
     }
   }
 
-  private _onRenderDoc(doc: IDocument): React.ReactElement<IDocument> {
-    return (
-      <Document key={doc.ServerRedirectedURL} Title={doc.Title} ServerRedirectedURL={doc.ServerRedirectedURL} FileExtension={doc.FileExtension} />
-    );
-  }
-
   private _updateState(): void {
     const webpartTitle: string = GetDocumentsModeString(this.props.mode);
     if (this.props.host.hostType === HostType.TestPage) {
       MockDocuments.get(this.props).then((r) => {
-        this.setState(new DocumentsSpFxState(r, webpartTitle));
+        this.setState(new DocumentsSpFxState(r, webpartTitle, this.props));
       });
     } else if (this.props.host.hostType === HostType.ModernPage) {
       DocumentFetcher.get(this.props).then((r) => {
-        this.setState(new DocumentsSpFxState(r, webpartTitle));
+        this.setState(new DocumentsSpFxState(r, webpartTitle, this.props));
       });
     }
   }
@@ -155,43 +156,69 @@ export default class DocumentsSpFx extends React.Component<IDocumentsSpFxWebPart
 
 class Document extends React.Component<IDocument, IDocument> {
   public render(): React.ReactElement<React.HTMLProps<HTMLDivElement>> {
-    const className: string = css(
-      styles.listItem,
-      'ms-Grid',
-      'ms-u-slideDownIn20'
-    );
+    const profileUrl: string = 'https://a830edad9050849spdk3012-my.sharepoint.com/_layouts/15/me.aspx?p=' + this.props.EditorOWSUserEmail;
+    const userPhotoUrl: string = '/_layouts/15/userphoto.aspx?size=M&accountname=' + this.props.EditorOWSUserEmail;
+    const filetypeImageUrl: string = '/_layouts/15/images/ic' + this.props.FileExtension + '.png';
+
+    const facepileClassName: string = css(
+          'ms-Facepile',
+          'pr-Facepile-inline',
+          styles['pr-Facepile-inline']);
+
+    const tTextClassName: string = css(
+          'ms-ListItem-tertiaryText',
+          'pr-tText',
+          styles['pr-tText']);
 
     return (
-      <div
-        key={this.props.ServerRedirectedURL}
-        role='row'
-        className={ className }
-        data-is-focusable={ true }
-        >
-        <FocusZone direction={ FocusZoneDirection.horizontal }>
-          <div className={ css(styles.spfxDocumentLi, 'ms-Grid-col', 'ms-u-sm11') }>
-            <a href={this.props.ServerRedirectedURL} target='_blank'>
-              <p className='ms-Icon ms-Icon--document' title={this.props.Title}>
-                (<span className='ms-font-m'>{this.props.FileExtension}</span>)
-                <span className='ms-font-m'> {this.props.Title}</span>
-              </p>
-            </a>
+      <li className="ms-ListItem">
+        <span className="ms-ListItem-primaryText">
+          <div className={facepileClassName}>
+            <div tabindex="1" role="button" className="ms-Facepile-itemBtn ms-Facepile-itemBtn--member" title={this.props.FileExtension}>
+              <div className="ms-Persona ms-Persona--xs">
+                <div className="ms-Persona-imageArea">
+                  <div className="ms-Persona-initials ms-Persona-initials--blue"></div>
+                  <img className="ms-Persona-image" src={filetypeImageUrl} alt="File type image"></img>
+                </div>
+                <div className="ms-Persona-presence"></div>
+                <div className="ms-Persona-details">
+                  <div className="ms-Persona-primaryText">{this.props.FileExtension}</div>
+                  <div className="ms-Persona-secondaryText">{this.props.Title}</div>
+                </div>
+              </div>
+            </div>
           </div>
-        </FocusZone>
-      </div>
+          <a className='ms-Link' href={this.props.ServerRedirectedURL} target='_blank'>{this.props.Title}</a>
+        </span>
+        <span className={tTextClassName}>
+          <a className='ms-Link' href={profileUrl} target='_blank'>{this.props.EditorOWSUserName}</a>
+        </span>
+        <span className="ms-ListItem-metaText"></span>
+
+        <div className="ms-ListItem-actions">
+          <div className="ms-ListItem-action">
+
+              <div className='ms-Facepile'>
+                <div className="ms-Facepile-members">
+                  <div tabindex="0" role="button" className="ms-Facepile-itemBtn ms-Facepile-itemBtn--member" title={this.props.EditorOWSUserName}>
+                    <div className="ms-Persona ms-Persona--xs">
+                      <div className="ms-Persona-imageArea">
+                        <div className="ms-Persona-initials ms-Persona-initials--blue"></div>
+                        <img className="ms-Persona-image" src={userPhotoUrl} alt="Persona image"></img>
+                      </div>
+                      <div className="ms-Persona-presence"></div>
+                      <div className="ms-Persona-details">
+                        <div className="ms-Persona-primaryText">{this.props.EditorOWSUserName}</div>
+                        <div className="ms-Persona-secondaryText">{this.props.EditorOWSUserEmail}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+          </div>
+        </div>
+      </li>
     );
   }
-
-  // public render(): JSX.Element {
-  //   return (
-  //     <li key={this.props.ServerRedirectedURL} className={styles.spfxDocumentLi}>
-  //       <a href={this.props.ServerRedirectedURL} target='_blank'>
-  //         <p className='ms-Icon ms-Icon--document' title={this.props.Title}>
-  //           (<span className='ms-font-m'>{this.props.FileExtension}</span>)
-  //           <span className='ms-font-m'> {this.props.Title}</span>
-  //         </p>
-  //       </a>
-  //     </li>
-  //   );
-  // }
 }

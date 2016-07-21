@@ -1,6 +1,8 @@
+@import 'fabric.components.min.css';
+
 .documentsSpFx {
   .container {
-    max-width: 700px;
+
     margin: 0px auto;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
   }
@@ -18,20 +20,33 @@
   .button {
     text-decoration: none;
   }
+
+  .heading {
+    font-size: 28px;
+  }
 }
 
 .spfxDocumentUl {
-    list-style: none;
+    max-width: 550px;
     width: 100%;
 }
 
 .spfxDocumentLi {
-    list-style: none;
     width: 100%;
-    height: 40px;
-    border: solid 1px #efefef;
-    span {
-      height:40px;
-      width: 40px;
-    }
+}
+
+.pr-left-padding {
+  padding-left: 28px;
+}
+
+.pr-Facepile-inline {
+  display: inline;
+}
+
+.pr-tText {
+  padding-left: 37px;
+}
+
+.ms-link {
+  padding: 2px;
 }
