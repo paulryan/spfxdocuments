@@ -4,6 +4,12 @@ import {
   IDocumentsSpFxWebPartProps
 } from './DocumentsSpFxWebPart';
 
+// import {
+//   GetDocumentsModeString,
+//   DocumentsMode,
+//   DocumentsScope
+// } from './DocumentsSpFx';
+
 export default class DocumentFetcher {
     public static get(props: IDocumentsSpFxWebPartProps): Promise<IDocument[]> {
       const baseUri: string = props.host.pageContext.webAbsoluteUrl + '/_api/search/query';

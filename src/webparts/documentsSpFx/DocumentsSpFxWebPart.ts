@@ -9,8 +9,7 @@ import {
   IWebPartData,
   IWebPartHost,
   PropertyPaneTextField,
-  PropertyPaneDropdown//,
-  //PropertyPaneSlider
+  PropertyPaneDropdown
 } from '@ms/sp-client-platform';
 
 import * as React from 'react';
@@ -18,18 +17,11 @@ import * as ReactDom from 'react-dom';
 
 import strings from './loc/Strings.resx';
 import DocumentsSpFx from './DocumentsSpFx';
-
-export enum DocumentsMode {
-    MyRecent = 1,
-    AllRecent = 2,
-    Trending = 3
-}
-
-export enum DocumentsScope {
-    Tenant = 1,
-    SiteCollection = 2,
-    Site = 3
-}
+import {
+  GetDocumentsModeString,
+  DocumentsMode,
+  DocumentsScope
+} from './DocumentsSpFx';
 
 export interface IDocumentsSpFxWebPartProps {
   mode: DocumentsMode;
@@ -45,6 +37,7 @@ export default class DocumentsSpFxWebPart extends BaseClientSideWebPart<IDocumen
   public constructor(context: IWebPartContext) {
     super(context);
   }
+
 
   public render(mode: DisplayMode, data?: IWebPartData): void {
     const element: React.ReactElement<IDocumentsSpFxWebPartProps> = React.createElement(DocumentsSpFx, {
@@ -73,9 +66,9 @@ export default class DocumentsSpFxWebPart extends BaseClientSideWebPart<IDocumen
                 PropertyPaneDropdown('mode', {
                   label: 'Mode',
                   options: [
-                    { key: DocumentsMode.MyRecent.toString(), text: 'My recent documents' },
-                    { key: DocumentsMode.AllRecent.toString(), text: 'Recently modified documents' },
-                    { key: DocumentsMode.Trending.toString(), text: 'Documents trending around me' }
+                    { key: DocumentsMode.MyRecent.toString(), text: GetDocumentsModeString(DocumentsMode.MyRecent) },
+                    { key: DocumentsMode.AllRecent.toString(), text: GetDocumentsModeString(DocumentsMode.AllRecent) },
+                    { key: DocumentsMode.Trending.toString(), text: GetDocumentsModeString(DocumentsMode.Trending) }
                   ]
                 }),
                 PropertyPaneDropdown('scope', {
@@ -89,10 +82,6 @@ export default class DocumentsSpFxWebPart extends BaseClientSideWebPart<IDocumen
                 PropertyPaneTextField('fileExtensions', {
                   label: 'File extensions'
                 }),
-                // PropertyPaneSlider('rowLimit', {
-                //   min: 1,
-                //   max: 20
-                // }),
                 PropertyPaneTextField('noResultsMessage', {
                   label: 'No results message'
                 }),

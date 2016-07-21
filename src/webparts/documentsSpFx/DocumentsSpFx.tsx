@@ -9,6 +9,30 @@ import {
   HostType
 } from '@ms/sp-client-platform';
 
+export enum DocumentsMode {
+  MyRecent = 1,
+  AllRecent = 2,
+  Trending = 3
+}
+
+export enum DocumentsScope {
+  Tenant = 1,
+  SiteCollection = 2,
+  Site = 3
+}
+
+export function GetDocumentsModeString(mode: DocumentsMode): string {
+  let str: string = 'undefined';
+  if (mode.toString() === DocumentsMode.AllRecent.toString()) {
+    str = 'All recent documents';
+  } else if (mode.toString() === DocumentsMode.MyRecent.toString()) {
+    str = 'My recent documents';
+  } else if (mode.toString() === DocumentsMode.Trending.toString()) {
+    str = 'Documents trending around me';
+  }
+  return str;
+}
+
 export interface IDocument {
   Title: string;
   ServerRedirectedURL: string;
@@ -17,11 +41,15 @@ export interface IDocument {
 
 export interface IDocumentsSpFxState {
   documents: IDocument[];
+  webpartTitle: string;
 }
 
 class DocumentsSpFxState implements IDocumentsSpFxState {
   public documents: IDocument[];
-  constructor(documents: IDocument[]) {
+  public webpartTitle: string;
+
+  constructor(documents: IDocument[], webpartTitle: string) {
+    this.webpartTitle = webpartTitle;
     if (documents && documents.length > 0) {
       this.documents = documents;
     } else {
@@ -32,7 +60,7 @@ class DocumentsSpFxState implements IDocumentsSpFxState {
 
 export default class DocumentsSpFx extends React.Component<IDocumentsSpFxWebPartProps, IDocumentsSpFxState> {
   public componentWillMount(): void {
-    this.setState(new DocumentsSpFxState([]));
+    this.setState(new DocumentsSpFxState([], 'Loading...'));
   }
 
   public componentDidMount(): void {
@@ -43,29 +71,39 @@ export default class DocumentsSpFx extends React.Component<IDocumentsSpFxWebPart
     this._updateState();
   }
 
+  public shouldComponentUpdate(): boolean {
+    return true;
+  }
+
   public render(): JSX.Element {
-    if (this.state && this.state.documents && this.state.documents.length > 0) {
-      const docs: JSX.Element[] = this.state.documents.map((doc: IDocument, indx: number) =>
+    const _self: DocumentsSpFx = this;
+    if (_self.state && _self.state.documents && _self.state.documents.length > 0) {
+
+      const docs: JSX.Element[] = _self.state.documents.map((doc: IDocument, indx: number) =>
         <Document key={indx} Title={doc.Title} ServerRedirectedURL={doc.ServerRedirectedURL} FileExtension={doc.FileExtension} />
       );
       return (
-        <ul className={styles.spfxDocumentUl}>
-          {docs}
-        </ul>
+        <div>
+          <h1>{_self.state.webpartTitle}</h1>
+          <ul className={styles.spfxDocumentUl}>
+            {docs}
+          </ul>
+        </div>
       );
     } else {
-      return <div className={styles.spfxDocumentUl}>{this.props.noResultsMessage}</div>;
+      return <div className={styles.spfxDocumentUl}>{_self.props.noResultsMessage}</div>;
     }
   }
 
   private _updateState(): void {
+    const webpartTitle: string = GetDocumentsModeString(this.props.mode);
     if (this.props.host.hostType === HostType.TestPage) {
       MockDocuments.get(this.props).then((r) => {
-        this.setState(new DocumentsSpFxState(r));
+        this.setState(new DocumentsSpFxState(r, webpartTitle));
       });
     } else if (this.props.host.hostType === HostType.ModernPage) {
       DocumentFetcher.get(this.props).then((r) => {
-        this.setState(new DocumentsSpFxState(r));
+        this.setState(new DocumentsSpFxState(r, webpartTitle));
       });
     }
   }
