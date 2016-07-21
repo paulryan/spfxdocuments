@@ -1,0 +1,11 @@
+{
+  "solution": {
+    "name": "paulryan-documents-webpart-client-side-solution",
+    "id": "5f446446-8081-4ded-bac2-a3e69862a19e",
+    "version": "1.0.0.0"
+  },
+  "paths": {
+    "manifestsMatch": "dist/**/*.manifest.json",
+    "zippedPackage": "paulryan-documents-webpart.spapp"
+  }
+}
