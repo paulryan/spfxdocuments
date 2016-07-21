@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## documents-webpart
 
 This is where you include your web part docs.
@@ -24,3 +25,6 @@ gulp test - TODO
 gulp watch - TODO
 gulp build - TODO
 gulp deploy - TODO
+=======
+# spfxdocuments
+>>>>>>> 44f5b42db2a91322050cfd5e6bd2a6843241fe66
