@@ -1,0 +1,1 @@
+define([],function(){var e={"_wa/3EK+ThFCJOL/BuleYhw":{PropertyPaneDescription:"PropertyPaneDescription",BasicGroupName:"BasicGroupName",DescriptionFieldLabel:"DescriptionFieldLabel"}};return e["default"]=e,e});

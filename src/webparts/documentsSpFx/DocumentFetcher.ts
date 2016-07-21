@@ -36,8 +36,8 @@ export default class DocumentFetcher {
 
     let apiUri: string = ''; // `/_api/web/lists?$filter=Hidden eq false`
     if (props.mode.toString() === '2') { // DocumentsMode.AllRecent
-      // TODO: sort on last modified
-      apiUri = '?' + queryText + '&rowlimit=' + props.rowLimit.toString() + '&' + selectProps;
+      const sortlist = "sortlist='LastModifiedTime:descending'";
+      apiUri = '?' + queryText + '&' + sortlist + '&rowlimit=' + props.rowLimit.toString() + '&' + selectProps;
     } else if (props.mode.toString() === '1') { // DocumentsMode.MyRecent
       const officeGraph: string = "properties='GraphQuery:ACTOR(ME\\,OR(action\\:1001\\,action\\:1003)),"
         + "GraphRankingModel:{\"features\"\\:[{\"function\"\\:\"EdgeTime\"}]}'&RankingModelId='0c77ded8-c3ef-466d-929d-905670ea1d72'";

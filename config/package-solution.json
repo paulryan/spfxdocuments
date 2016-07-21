@@ -5,7 +5,7 @@
     "version": "1.0.0.0"
   },
   "paths": {
-    "manifestsMatch": "dist/**/*.manifest.json",
+    "manifestsMatch": "deploy/**/*.json",
     "zippedPackage": "paulryan-documents-webpart.spapp"
   }
 }

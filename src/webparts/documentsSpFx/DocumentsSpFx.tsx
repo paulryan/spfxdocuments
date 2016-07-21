@@ -98,6 +98,11 @@ export default class DocumentsSpFx extends React.Component<IDocumentsSpFxWebPart
   }
 
   public render(): React.ReactElement<IFocusZoneProps> {
+    const headingClassName: string = css(
+      'pr-left-padding',
+      styles['pr-left-padding'],
+      'ms-font-xxl');
+
     if (this.state && this.state.documents) {
       if (this.state.documents.length > 0) {
         const docs: JSX.Element[] = this.state.documents.map(doc => {
@@ -112,11 +117,6 @@ export default class DocumentsSpFx extends React.Component<IDocumentsSpFxWebPart
               />
           );
         });
-        const headingClassName: string = css(
-          'pr-left-padding',
-          styles['pr-left-padding'],
-          'ms-font-xxl');
-
         return (
           <FocusZone
             direction={ FocusZoneDirection.vertical }
@@ -132,10 +132,21 @@ export default class DocumentsSpFx extends React.Component<IDocumentsSpFxWebPart
           </FocusZone>
         );
       } else {
-        return <div className={styles.spfxDocumentUl}>{this.props.noResultsMessage}</div>;
+        return (
+          <FocusZone
+            direction={ FocusZoneDirection.vertical }
+            isInnerZoneKeystroke={ (ev: KeyboardEvent) => ev.which === KeyCodes.right }
+            className={styles.spfxDocumentUl}
+            >
+            <div className={headingClassName}>
+              {this.state.webpartTitle}
+            </div>
+            <div className={styles['pr-left-padding']}>{this.props.noResultsMessage}</div>
+          </FocusZone>
+        );
       }
     } else {
-      return <Spinner type={ SpinnerType.large } label='Loading...' />;
+      return (<Spinner type={ SpinnerType.large } label='Loading...' />);
     }
   }
 
@@ -145,7 +156,8 @@ export default class DocumentsSpFx extends React.Component<IDocumentsSpFxWebPart
       MockDocuments.get(this.props).then((r) => {
         this.setState(new DocumentsSpFxState(r, webpartTitle, this.props));
       });
-    } else if (this.props.host.hostType === HostType.ModernPage) {
+    } else if (this.props.host.hostType === HostType.ModernPage
+      || this.props.host.hostType === HostType.ClassicPage) {
       DocumentFetcher.get(this.props).then((r) => {
         this.setState(new DocumentsSpFxState(r, webpartTitle, this.props));
       });
@@ -161,14 +173,14 @@ class Document extends React.Component<IDocument, IDocument> {
     const filetypeImageUrl: string = '/_layouts/15/images/ic' + this.props.FileExtension + '.png';
 
     const facepileClassName: string = css(
-          'ms-Facepile',
-          'pr-Facepile-inline',
-          styles['pr-Facepile-inline']);
+      'ms-Facepile',
+      'pr-Facepile-inline',
+      styles['pr-Facepile-inline']);
 
     const tTextClassName: string = css(
-          'ms-ListItem-tertiaryText',
-          'pr-tText',
-          styles['pr-tText']);
+      'ms-ListItem-tertiaryText',
+      'pr-tText',
+      styles['pr-tText']);
 
     return (
       <li className="ms-ListItem">
@@ -198,24 +210,24 @@ class Document extends React.Component<IDocument, IDocument> {
         <div className="ms-ListItem-actions">
           <div className="ms-ListItem-action">
 
-              <div className='ms-Facepile'>
-                <div className="ms-Facepile-members">
-                  <div tabindex="0" role="button" className="ms-Facepile-itemBtn ms-Facepile-itemBtn--member" title={this.props.EditorOWSUserName}>
-                    <div className="ms-Persona ms-Persona--xs">
-                      <div className="ms-Persona-imageArea">
-                        <div className="ms-Persona-initials ms-Persona-initials--blue"></div>
-                        <img className="ms-Persona-image" src={userPhotoUrl} alt="Persona image"></img>
-                      </div>
-                      <div className="ms-Persona-presence"></div>
-                      <div className="ms-Persona-details">
-                        <div className="ms-Persona-primaryText">{this.props.EditorOWSUserName}</div>
-                        <div className="ms-Persona-secondaryText">{this.props.EditorOWSUserEmail}</div>
-                      </div>
+            <div className='ms-Facepile'>
+              <div className="ms-Facepile-members">
+                <div tabindex="0" role="button" className="ms-Facepile-itemBtn ms-Facepile-itemBtn--member" title={this.props.EditorOWSUserName}>
+                  <div className="ms-Persona ms-Persona--xs">
+                    <div className="ms-Persona-imageArea">
+                      <div className="ms-Persona-initials ms-Persona-initials--blue"></div>
+                      <img className="ms-Persona-image" src={userPhotoUrl} alt="Persona image"></img>
+                    </div>
+                    <div className="ms-Persona-presence"></div>
+                    <div className="ms-Persona-details">
+                      <div className="ms-Persona-primaryText">{this.props.EditorOWSUserName}</div>
+                      <div className="ms-Persona-secondaryText">{this.props.EditorOWSUserEmail}</div>
                     </div>
                   </div>
-
                 </div>
+
               </div>
+            </div>
           </div>
         </div>
       </li>
