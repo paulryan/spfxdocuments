@@ -16,7 +16,8 @@
       "mode": "1",
       "scope": "1",
       "rowLimit": 5,
-      "fileExtensions": "doc,docx,xsl,xslx,ppt,pptx,txt"
+      "fileExtensions": "doc,docx,xsl,xslx,ppt,pptx,txt",
+      "noResultsMessage": "There are no documents matching your query"
     }
   }]
 }

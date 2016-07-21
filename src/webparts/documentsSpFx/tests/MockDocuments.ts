@@ -4,12 +4,12 @@ import {IDocumentsSpFxWebPartProps} from '../DocumentsSpFxWebPart';
 export default class MockDocuments {
 
     private static _items: IDocument[] = [
-      { title: 'My important document', url: 'https://www.bing.com', fileExtension: 'docx' },
-      { title: 'The SharePoint Framework', url: 'https://www.bing.com', fileExtension: 'docx' },
-      { title: 'Finance Report', url: 'https://www.bing.com', fileExtension: 'xslx' },
-      { title: 'My holiday slideshow', url: 'https://www.bing.com', fileExtension: 'pptx' },
-      { title: 'Passwords and account numbers', url: 'https://www.bing.com', fileExtension: 'txtx' },
-      { title: 'Statement of Work', url: 'https://www.bing.com', fileExtension: 'docx' }
+      { Title: 'My important document', ServerRedirectedURL: 'https://www.bing.com', FileExtension: 'docx' },
+      { Title: 'The SharePoint Framework', ServerRedirectedURL: 'https://www.bing.com', FileExtension: 'docx' },
+      { Title: 'Finance Report', ServerRedirectedURL: 'https://www.bing.com', FileExtension: 'xslx' },
+      { Title: 'My holiday slideshow', ServerRedirectedURL: 'https://www.bing.com', FileExtension: 'pptx' },
+      { Title: 'Passwords and account numbers', ServerRedirectedURL: 'https://www.bing.com', FileExtension: 'txtx' },
+      { Title: 'Statement of Work', ServerRedirectedURL: 'https://www.bing.com', FileExtension: 'docx' }
     ];
 
     public static get(props: IDocumentsSpFxWebPartProps): Promise<IDocument[]> {

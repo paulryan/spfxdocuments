@@ -21,14 +21,14 @@ import DocumentsSpFx from './DocumentsSpFx';
 
 export enum DocumentsMode {
     MyRecent = 1,
-    AllRecent,
-    Trending
+    AllRecent = 2,
+    Trending = 3
 }
 
 export enum DocumentsScope {
     Tenant = 1,
-    SiteCollection,
-    Site
+    SiteCollection = 2,
+    Site = 3
 }
 
 export interface IDocumentsSpFxWebPartProps {
@@ -37,6 +37,7 @@ export interface IDocumentsSpFxWebPartProps {
   fileExtensions: string;
   scope: DocumentsScope;
   host: IWebPartHost;
+  noResultsMessage: string;
 }
 
 export default class DocumentsSpFxWebPart extends BaseClientSideWebPart<IDocumentsSpFxWebPartProps> {
@@ -51,7 +52,8 @@ export default class DocumentsSpFxWebPart extends BaseClientSideWebPart<IDocumen
       rowLimit: this.properties.rowLimit,
       fileExtensions: this.properties.fileExtensions,
       scope: this.properties.scope,
-      host: this.host
+      host: this.host,
+      noResultsMessage: this.properties.noResultsMessage
     });
 
     ReactDom.render(element, this.domElement);
@@ -86,11 +88,17 @@ export default class DocumentsSpFxWebPart extends BaseClientSideWebPart<IDocumen
                 }),
                 PropertyPaneTextField('fileExtensions', {
                   label: 'File extensions'
-                })//,
+                }),
                 // PropertyPaneSlider('rowLimit', {
                 //   min: 1,
                 //   max: 20
-                // })
+                // }),
+                PropertyPaneTextField('noResultsMessage', {
+                  label: 'No results message'
+                }),
+                PropertyPaneTextField('rowLimit', {
+                  label: 'Max results to return'
+                })
               ]
             }
           ]

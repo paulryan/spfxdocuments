@@ -10,9 +10,9 @@ import {
 } from '@ms/sp-client-platform';
 
 export interface IDocument {
-  title: string;
-  url: string;
-  fileExtension: string;
+  Title: string;
+  ServerRedirectedURL: string;
+  FileExtension: string;
 }
 
 export interface IDocumentsSpFxState {
@@ -22,7 +22,11 @@ export interface IDocumentsSpFxState {
 class DocumentsSpFxState implements IDocumentsSpFxState {
   public documents: IDocument[];
   constructor(documents: IDocument[]) {
-    this.documents = documents;
+    if (documents && documents.length > 0) {
+      this.documents = documents;
+    } else {
+      this.documents = [];
+    }
   }
 }
 
@@ -32,45 +36,49 @@ export default class DocumentsSpFx extends React.Component<IDocumentsSpFxWebPart
   }
 
   public componentDidMount(): void {
-    if (this.props.host.hostType === HostType.TestPage) {
-      this._getMockDocuments().then((r) => {
-        this.setState(new DocumentsSpFxState(r));
-      });
-    } else if (this.props.host.hostType === HostType.ModernPage) {
-      this._getDocuments().then((r) => {
-        this.setState(new DocumentsSpFxState(r));
-      });
-    }
+    this._updateState();
+  }
+
+  public componentWillReceiveProps(): void {
+    this._updateState();
   }
 
   public render(): JSX.Element {
-    const docs: JSX.Element[] = this.state.documents.map((doc: IDocument, indx: number) =>
-      <Document key={indx} title={doc.title} url={doc.url} fileExtension={doc.fileExtension} />
-    );
-    return (
-      <ul className={styles.spfxDocumentUl}>
-        {docs}
-      </ul>
-    );
+    if (this.state && this.state.documents && this.state.documents.length > 0) {
+      const docs: JSX.Element[] = this.state.documents.map((doc: IDocument, indx: number) =>
+        <Document key={indx} Title={doc.Title} ServerRedirectedURL={doc.ServerRedirectedURL} FileExtension={doc.FileExtension} />
+      );
+      return (
+        <ul className={styles.spfxDocumentUl}>
+          {docs}
+        </ul>
+      );
+    } else {
+      return <div className={styles.spfxDocumentUl}>{this.props.noResultsMessage}</div>;
+    }
   }
 
-  private _getMockDocuments(): Promise<IDocument[]> {
-    return MockDocuments.get(this.props);
-  }
-
-  private _getDocuments(): Promise<IDocument[]> {
-    return DocumentFetcher.get(this.props);
+  private _updateState(): void {
+    if (this.props.host.hostType === HostType.TestPage) {
+      MockDocuments.get(this.props).then((r) => {
+        this.setState(new DocumentsSpFxState(r));
+      });
+    } else if (this.props.host.hostType === HostType.ModernPage) {
+      DocumentFetcher.get(this.props).then((r) => {
+        this.setState(new DocumentsSpFxState(r));
+      });
+    }
   }
 }
 
 class Document extends React.Component<IDocument, IDocument> {
   public render(): JSX.Element {
     return (
-      <li className={styles.spfxDocumentLi}>
-        <a href={this.props.url} target='_blank'>
-          <p className='ms-Icon ms-Icon--document' title={this.props.title}>
-            (<span className='ms-font-m'>{this.props.fileExtension}</span>)
-            <span className='ms-font-m'> {this.props.title}</span>
+      <li key={this.props.ServerRedirectedURL} className={styles.spfxDocumentLi}>
+        <a href={this.props.ServerRedirectedURL} target='_blank'>
+          <p className='ms-Icon ms-Icon--document' title={this.props.Title}>
+            (<span className='ms-font-m'>{this.props.FileExtension}</span>)
+            <span className='ms-font-m'> {this.props.Title}</span>
           </p>
         </a>
       </li>
