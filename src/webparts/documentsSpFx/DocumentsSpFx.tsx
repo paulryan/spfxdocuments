@@ -120,7 +120,11 @@ export default class DocumentsSpFx extends React.Component<IDocumentsSpFxWebPart
 
 class Document extends React.Component<IDocument, IDocument> {
   public render(): React.ReactElement<React.HTMLProps<HTMLDivElement>> {
-    const tenantName: string = 'a830edad9050849spdk3012'; // TODO: get this dynamically, handle HostPage.TestPage
+    let tenantName: string = 'unknown';
+    const subDomainIndex = (location && location.hostname) ? location.hostname.indexOf('.') : -1;
+    if (subDomainIndex > -1) {
+      tenantName = location.hostname.substring(0, subDomainIndex);
+    }
     const profileUrl: string = 'https://' + tenantName + '-my.sharepoint.com/_layouts/15/me.aspx?p=' + this.props.EditorOWSUserEmail;
     const userPhotoUrl: string = '/_layouts/15/userphoto.aspx?size=M&accountname=' + this.props.EditorOWSUserEmail;
     const filetypeImageUrl: string = '/_layouts/15/images/ic' + this.props.FileExtension + '.png';
