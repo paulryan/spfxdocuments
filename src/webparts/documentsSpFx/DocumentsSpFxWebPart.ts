@@ -7,7 +7,6 @@ import {
   IPropertyPaneSettings,
   IWebPartContext,
   IWebPartData,
-  IWebPartHost,
   PropertyPaneTextField,
   PropertyPaneDropdown
 } from '@ms/sp-client-platform';
@@ -20,24 +19,15 @@ import DocumentsSpFx from './DocumentsSpFx';
 import {
   GetDocumentsModeString,
   DocumentsMode,
-  DocumentsScope
-} from './DocumentsSpFx';
-
-export interface IDocumentsSpFxWebPartProps {
-  mode: DocumentsMode;
-  rowLimit: number;
-  fileExtensions: string;
-  scope: DocumentsScope;
-  host: IWebPartHost;
-  noResultsMessage: string;
-}
+  DocumentsScope,
+  IDocumentsSpFxWebPartProps
+} from './DocumentsSpFxInterfaces';
 
 export default class DocumentsSpFxWebPart extends BaseClientSideWebPart<IDocumentsSpFxWebPartProps> {
 
   public constructor(context: IWebPartContext) {
     super(context);
   }
-
 
   public render(mode: DisplayMode, data?: IWebPartData): void {
     const element: React.ReactElement<IDocumentsSpFxWebPartProps> = React.createElement(DocumentsSpFx, {
@@ -85,7 +75,7 @@ export default class DocumentsSpFxWebPart extends BaseClientSideWebPart<IDocumen
                 PropertyPaneTextField('noResultsMessage', {
                   label: 'No results message'
                 }),
-                PropertyPaneTextField('rowLimit', {
+                PropertyPaneTextField('rowLimit', { // TODO: Replace with slider control
                   label: 'Max results to return'
                 })
               ]

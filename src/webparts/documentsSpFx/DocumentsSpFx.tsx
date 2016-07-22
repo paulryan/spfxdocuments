@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 import styles from './DocumentsSpFx.module.scss';
-import {IDocumentsSpFxWebPartProps} from './DocumentsSpFxWebPart';
 import MockDocuments from './tests/MockDocuments';
 import DocumentFetcher from './DocumentFetcher';
 
@@ -19,63 +18,14 @@ import {
   SpinnerType
 } from '@ms/office-ui-fabric-react';
 
-export enum DocumentsMode {
-  MyRecent = 1,
-  AllRecent = 2,
-  Trending = 3
-}
+import {
+  GetDocumentsModeString,
+  IDocument,
+  IDocumentsSpFxState,
+  IDocumentsSpFxWebPartProps
+} from './DocumentsSpFxInterfaces';
 
-export enum DocumentsScope {
-  Tenant = 1,
-  SiteCollection = 2,
-  Site = 3
-}
-
-export function GetDocumentsModeString(mode: DocumentsMode): string {
-  let str: string = 'undefined';
-  if (mode.toString() === DocumentsMode.AllRecent.toString()) {
-    str = 'All recent documents';
-  } else if (mode.toString() === DocumentsMode.MyRecent.toString()) {
-    str = 'My recent documents';
-  } else if (mode.toString() === DocumentsMode.Trending.toString()) {
-    str = 'Documents trending around me';
-  }
-  return str;
-}
-
-export interface IDocument {
-  Title: string;
-  ServerRedirectedURL: string;
-  FileExtension: string;
-  EditorOWSUserName: string;
-  EditorOWSUserEmail: string;
-  LastModifiedTime: string;
-}
-
-export interface IDocumentsSpFxState {
-  documents: IDocument[];
-  webpartTitle: string;
-  props: IDocumentsSpFxWebPartProps;
-}
-
-class DocumentsSpFxState implements IDocumentsSpFxState {
-  public documents: IDocument[];
-  public webpartTitle: string;
-  public props: IDocumentsSpFxWebPartProps;
-
-  constructor(documents: IDocument[], webpartTitle: string, props: IDocumentsSpFxWebPartProps) {
-    this.webpartTitle = webpartTitle;
-    this.props = props;
-
-    if (documents && documents.length > 0) {
-      this.documents = documents;
-    } else if (documents && documents.length < 1) {
-      this.documents = [];
-    } else {
-      return null;
-    }
-  }
-}
+import DocumentsSpFxState from './DocumentsSpFxState';
 
 export default class DocumentsSpFx extends React.Component<IDocumentsSpFxWebPartProps, IDocumentsSpFxState> {
   public componentWillMount(): void {
@@ -170,7 +120,8 @@ export default class DocumentsSpFx extends React.Component<IDocumentsSpFxWebPart
 
 class Document extends React.Component<IDocument, IDocument> {
   public render(): React.ReactElement<React.HTMLProps<HTMLDivElement>> {
-    const profileUrl: string = 'https://a830edad9050849spdk3012-my.sharepoint.com/_layouts/15/me.aspx?p=' + this.props.EditorOWSUserEmail;
+    const tenantName: string = 'a830edad9050849spdk3012'; // TODO: get this dynamically, handle HostPage.TestPage
+    const profileUrl: string = 'https://' + tenantName + '-my.sharepoint.com/_layouts/15/me.aspx?p=' + this.props.EditorOWSUserEmail;
     const userPhotoUrl: string = '/_layouts/15/userphoto.aspx?size=M&accountname=' + this.props.EditorOWSUserEmail;
     const filetypeImageUrl: string = '/_layouts/15/images/ic' + this.props.FileExtension + '.png';
 
@@ -188,11 +139,13 @@ class Document extends React.Component<IDocument, IDocument> {
       <li className="ms-ListItem">
         <span className="ms-ListItem-primaryText">
           <div className={facepileClassName}>
-            <div tabindex="1" role="button" className="ms-Facepile-itemBtn ms-Facepile-itemBtn--member" title={this.props.FileExtension}>
+            <div role="button" className="ms-Facepile-itemBtn ms-Facepile-itemBtn--member" title={this.props.FileExtension}>
               <div className="ms-Persona ms-Persona--xs">
                 <div className="ms-Persona-imageArea">
-                  <div className="ms-Persona-initials ms-Persona-initials--blue"></div>
-                  <img className="ms-Persona-image" src={filetypeImageUrl} alt="File type image"></img>
+                  <a className='ms-Link' href={this.props.ServerRedirectedURL} target='_blank' title={this.props.Title}>
+                    <div className="ms-Persona-initials ms-Persona-initials--blue"></div>
+                    <img className="ms-Persona-image" src={filetypeImageUrl} alt="File type image"></img>
+                  </a>
                 </div>
                 <div className="ms-Persona-presence"></div>
                 <div className="ms-Persona-details">
@@ -214,11 +167,13 @@ class Document extends React.Component<IDocument, IDocument> {
 
             <div className='ms-Facepile'>
               <div className="ms-Facepile-members">
-                <div tabindex="0" role="button" className="ms-Facepile-itemBtn ms-Facepile-itemBtn--member" title={this.props.EditorOWSUserName}>
+                <div role="button" className="ms-Facepile-itemBtn ms-Facepile-itemBtn--member" title={this.props.EditorOWSUserName}>
                   <div className="ms-Persona ms-Persona--xs">
                     <div className="ms-Persona-imageArea">
-                      <div className="ms-Persona-initials ms-Persona-initials--blue"></div>
-                      <img className="ms-Persona-image" src={userPhotoUrl} alt="Persona image"></img>
+                      <a className='ms-Link' href={profileUrl} target='_blank' title={this.props.EditorOWSUserName}>
+                        <div className="ms-Persona-initials ms-Persona-initials--blue"></div>
+                        <img className="ms-Persona-image" src={userPhotoUrl} alt="Persona image"></img>
+                      </a>
                     </div>
                     <div className="ms-Persona-presence"></div>
                     <div className="ms-Persona-details">

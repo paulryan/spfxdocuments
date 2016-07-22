@@ -44,13 +44,13 @@
     "one-line": [true,
       "check-open-brace",
       "check-catch",
-      "check-else",
+      // "check-else",
       "check-finally",
       "check-whitespace"
     ],
-    "quotemark": [true, "single", "avoid-escape"],
+    "quotemark": [false],
     "radix": true,
-    "semicolon": true,
+    "semicolon": [true],
     "trailing-comma": [true, {
       "singleline": "never",
       "multiline": "never"
